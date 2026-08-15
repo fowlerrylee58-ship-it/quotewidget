@@ -1,0 +1,228 @@
+<style> /* 1. Clear out Notion's background layer */ html, body { background: transparent !important; margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; } /* 2. Style your actual widget box here */ .quote-widget { /* Change #f4f4f4 to whatever color or gradient you want your widget to be */ background-color: #f4f4f4; border-radius: 8px; /* Rounds the corners of your widget */ padding: 16px; box-sizing: border-box; width: 100%; height: 100%; /* Centers your text inside the widget box */ display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; 
+  position: relative; /* Added to let the button sit precisely in the corner */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Default Notion font */
+  transition: border 0.2s ease, box-shadow 0.2s ease; /* Smooth border transitions */
+} 
+
+/* Increased font size and optimized line spacing for readability */
+#writing-quote {
+  font-size: 1.25rem; 
+  line-height: 1.45;
+  margin: 0;
+  padding: 0 8px;
+}
+
+/* Button container in top right corner */
+.widget-controls {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+}
+
+/* Base button styles */
+.ctrl-btn {
+  cursor: pointer; 
+  padding: 4px 8px; 
+  font-size: 0.75rem; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  background-color: #fff; 
+  color: #333;
+}
+
+/* Reveal buttons on widget hover */
+.quote-widget:hover .widget-controls {
+  opacity: 1;
+}
+
+/* Settings Menu Overlay */
+.settings-menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.96);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+.settings-menu.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #444;
+}
+
+.menu-section button {
+  cursor: pointer;
+  padding: 3px 6px;
+  font-size: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.color-swatch {
+  width: 16px; 
+  height: 16px; 
+  padding: 0; 
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+}
+</style> 
+
+<div class="quote-widget" id="widget-box"> 
+  <!-- Hidden Controls Panel -->
+  <div class="widget-controls">
+    <button id="reroll-btn" class="ctrl-btn">Reroll</button>
+    <button id="settings-btn" class="ctrl-btn">⚙️</button>
+  </div>
+
+  <!-- Settings Panel Overlay -->
+  <div class="settings-menu" id="settings-panel">
+    <div class="menu-section" style="flex-wrap: wrap; justify-content: center; max-width: 95%;">
+      <span>Fonts:</span>
+      <button onclick="changeFont('sans')">Sans</button>
+      <button onclick="changeFont('serif')">Serif</button>
+      <button onclick="changeFont('mono')">Typewriter</button>
+      <button onclick="changeFont('cursive')">Cursive</button>
+      <button onclick="changeFont('garamond')">Classic</button>
+      <button onclick="changeFont('modern')">Clean</button>
+    </div>
+    
+    <div class="menu-section" style="flex-wrap: wrap; justify-content: center; max-width: 95%;">
+      <span>BG Colors:</span>
+      <button class="color-swatch" onclick="changeColor('#f4f4f4')" style="background:#f4f4f4;"></button>
+      <button class="color-swatch" onclick="changeColor('#ffffff')" style="background:#ffffff;"></button>
+      <button class="color-swatch" onclick="changeColor('#2f3437')" style="background:#2f3437;"></button>
+      <button class="color-swatch" onclick="changeColor('#fcebe6')" style="background:#fcebe6;" title="Blush Pink"></button>
+      <button class="color-swatch" onclick="changeColor('#eaf4ec')" style="background:#eaf4ec;" title="Mint Green"></button>
+      <button class="color-swatch" onclick="changeColor('#fbf5e6')" style="background:#fbf5e6;" title="Vanilla Paste"></button>
+      <button class="color-swatch" onclick="changeColor('#f0ebf7')" style="background:#f0ebf7;" title="Lavender"></button>
+      <button class="color-swatch" onclick="changeColor('#e6f0fa')" style="background:#e6f0fa;" title="Cloud Blue"></button>
+    </div>
+
+    <div class="menu-section" style="flex-wrap: wrap; justify-content: center; max-width: 95%;">
+      <span>Text Colors:</span>
+      <button class="color-swatch" onclick="changeTextColor('#333333')" style="background:#333333;" title="Charcoal"></button>
+      <button class="color-swatch" onclick="changeTextColor('#ffffff')" style="background:#ffffff;" title="White"></button>
+      <button class="color-swatch" onclick="changeTextColor('#4a3b32')" style="background:#4a3b32;" title="Espresso"></button>
+      <button class="color-swatch" onclick="changeTextColor('#2b3a4a')" style="background:#2b3a4a;" title="Navy"></button>
+      <button class="color-swatch" onclick="changeTextColor('#8c5861')" style="background:#8c5861;" title="Rose"></button>
+    </div>
+
+    <div class="menu-section">
+      <span>Border:</span>
+      <button onclick="changeBorder('none')">None</button>
+      <button onclick="changeBorder('line')">Line</button>
+      <button onclick="changeBorder('shadow')">Shadow</button>
+    </div>
+    
+    <button id="close-settings" class="ctrl-btn" style="margin-top: 4px;">Done</button>
+  </div>
+
+  <p id="writing-quote">"Your quote goes here."</p> 
+</div>
+
+<script>
+  const quotes = [
+    "\"You can always edit a bad page. You can’t edit a blank page.\" — Jodi Picoult",
+    "\"The first draft is just you telling yourself the story.\" — Terry Pratchett",
+    "\"Start writing, no matter what. The water does not flow until the faucet is turned on.\" — Louis L'Amour",
+    "\"Write your first draft with your heart. Rewrite with your head.\" — Mike Rich",
+    "\"If there's a book that you want to read, but it hasn't been written yet, then you must write it.\" — Toni Morrison",
+    "\"A professional writer is an amateur who didn’t quit.\" — Richard Bach",
+    "\"Close the door. Write with no one looking over your shoulder.\" — Stephen King"
+  ];
+
+  const widgetBox = document.getElementById("widget-box");
+  const settingsPanel = document.getElementById("settings-panel");
+  const quoteText = document.getElementById("writing-quote");
+
+  // Load Saved Personalizations
+  if(localStorage.getItem("widget-font")) changeFont(localStorage.getItem("widget-font"));
+  if(localStorage.getItem("widget-bg")) changeColor(localStorage.getItem("widget-bg"));
+  if(localStorage.getItem("widget-text-color")) changeTextColor(localStorage.getItem("widget-text-color"));
+  if(localStorage.getItem("widget-border")) changeBorder(localStorage.getItem("widget-border"));
+
+  function showQuote(index) {
+    quoteText.textContent = quotes[index];
+  }
+
+  // Set the initial daily quote based on calendar date
+  const today = new Date();
+  const dayOfYear = today.getFullYear() * 366 + today.getMonth() * 31 + today.getDate();
+  let currentIndex = dayOfYear % quotes.length;
+  showQuote(currentIndex);
+
+  // Reroll action
+  document.getElementById("reroll-btn").addEventListener("click", function() {
+    let newIndex;
+    do {
+      newIndex = Math.floor(Math.random() * quotes.length);
+    } while (newIndex === currentIndex && quotes.length > 1);
+    currentIndex = newIndex;
+    showQuote(currentIndex);
+  });
+
+  // Settings Panel Menu Handlers
+  document.getElementById("settings-btn").addEventListener("click", () => settingsPanel.classList.add("open"));
+  document.getElementById("close-settings").addEventListener("click", () => settingsPanel.classList.remove("open"));
+
+  // Styling Customization Functions
+  function changeFont(type) {
+    if(type === 'sans') widgetBox.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    if(type === 'serif') widgetBox.style.fontFamily = 'Georgia, Cambria, "Times New Roman", serif';
+    if(type === 'mono') widgetBox.style.fontFamily = '"Courier New", Courier, Lucida, monospace';
+    if(type === 'cursive') widgetBox.style.fontFamily = '"Brush Script MT", "Comic Sans MS", cursive';
+    if(type === 'garamond') widgetBox.style.fontFamily = 'Garamond, Baskerville, "Baskerville Old Face", serif';
+    if(type === 'modern') widgetBox.style.fontFamily = '"Century Gothic", Futura, sans-serif';
+    localStorage.setItem("widget-font", type);
+  }
+
+  function changeColor(color) {
+    widgetBox.style.backgroundColor = color;
+    localStorage.setItem("widget-bg", color);
+  }
+
+  function changeTextColor(color) {
+    quoteText.style.color = color;
+    localStorage.setItem("widget-text-color", color);
+  }
+
+  function changeBorder(style) {
+    if (style === 'none') {
+      widgetBox.style.border = 'none';
+      widgetBox.style.boxShadow = 'none';
+    } else if (style === 'line') {
+      widgetBox.style.border = '1px solid rgba(0, 0, 0, 0.12)';
+      widgetBox.style.boxShadow = 'none';
+    } else if (style === 'shadow') {
+      widgetBox.style.border = 'none';
+      widgetBox.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+    }
+    localStorage.setItem("widget-border", style);
+  }
+</script>
